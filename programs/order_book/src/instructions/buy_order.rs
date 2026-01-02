@@ -13,12 +13,15 @@ pub fn buy_order(ctx:Context<BuyOrderLimit>,_id: u64,quantity: u64,buy_price: u6
     ctx.accounts.buy_order.id = _id;
     ctx.accounts.buy_order.owner = ctx.accounts.user.key();
     ctx.accounts.buy_order.quantity = quantity;
+    ctx.accounts.buy_order.remaining = quantity;
     ctx.accounts.buy_order.buy_price = buy_price;
     ctx.accounts.buy_order.is_filled = false;
     ctx.accounts.buy_order.base_mint = base_mint;
     ctx.accounts.buy_order.quote_mint = quote_mint;
+    ctx.accounts.buy_order.quantity_filled = 0;
     ctx.accounts.buy_order.created_at = Clock::get()?.unix_timestamp as u64;
     ctx.accounts.buy_order.bump = ctx.bumps.buy_order;
+    ctx.accounts.market.total_orders_created += 1;
     msg!("Buy order created successfully");
 
     let total_usdc_to_pull = quantity
@@ -39,7 +42,7 @@ pub fn buy_order(ctx:Context<BuyOrderLimit>,_id: u64,quantity: u64,buy_price: u6
 #[instruction(id: u64,base_mint: Pubkey,quote_mint: Pubkey)]
 pub struct BuyOrderLimit<'info> {
 
-    #[account(init,payer = user, space = 8 + BuyOrder::INIT_SPACE,seeds =[b"buy_limit_order",user.key().as_ref(),id.to_le_bytes().as_ref()],bump)]
+    #[account(init,payer = user, space = 8 + BuyOrder::INIT_SPACE,seeds =[b"buy_limit_order",id.to_le_bytes().as_ref()],bump)]
     pub buy_order: Account<'info, BuyOrder>,
 
     #[account(mint::token_program=token_program)]

@@ -7,6 +7,7 @@ pub fn initilize_market(ctx:Context<InitializeMarket>,base_mint:Pubkey,quote_min
     ctx.accounts.market.base_mint = base_mint;
     ctx.accounts.market.quote_mint = quote_mint;
     ctx.accounts.market.bump = ctx.bumps.market;
+    ctx.accounts.market.total_orders_created = 0;
     msg!("Market initialized successfully");
     Ok(())
 }

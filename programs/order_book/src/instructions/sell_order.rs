@@ -9,12 +9,15 @@ pub fn sell_order(ctx:Context<SellOrderLimit>,id: u64,quantity: u64,sell_price: 
     ctx.accounts.sell_order.id = id;
     ctx.accounts.sell_order.owner = ctx.accounts.user.key();
     ctx.accounts.sell_order.quantity = quantity;
+    ctx.accounts.sell_order.remaining = quantity;
     ctx.accounts.sell_order.sell_price = sell_price;
+    ctx.accounts.sell_order.quantity_filled = 0;
     ctx.accounts.sell_order.is_filled = false;
     ctx.accounts.sell_order.base_mint = base_mint;
     ctx.accounts.sell_order.quote_mint = quote_mint;
     ctx.accounts.sell_order.created_at = Clock::get()?.unix_timestamp as u64;
     ctx.accounts.sell_order.bump = ctx.bumps.sell_order;
+    ctx.accounts.market.total_orders_created += 1;
     msg!("Sell order created successfully");
 
   
@@ -38,7 +41,7 @@ pub struct SellOrderLimit<'info>{
     #[account(mut)]
     pub user:Signer<'info>,
 
-    #[account(init,payer = user, space = 8 + SellOrder::INIT_SPACE,seeds =[b"sell_limit_order",user.key().as_ref(),id.to_le_bytes().as_ref()],bump)]
+    #[account(init,payer = user, space = 8 + SellOrder::INIT_SPACE,seeds =[b"sell_limit_order",id.to_le_bytes().as_ref()],bump)]
     pub sell_order: Account<'info, SellOrder>,
 
     #[account(mut,seeds=[b"market",base_mint.key().as_ref(),quote_mint.key().as_ref()],bump)]
