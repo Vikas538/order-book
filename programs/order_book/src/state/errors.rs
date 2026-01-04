@@ -8,4 +8,6 @@ pub enum ErrorCode{
     InvalidQuoteMint,
     #[msg("Invalid token mint")]
     InvalidTokenMint,
+    #[msg("Invalid order")]
+    InvalidOrder,
 }

@@ -5,7 +5,7 @@ token_interface::{Mint,TokenAccount,TokenInterface,transfer_checked,TransferChec
 };
 
 
-use crate::state::{BuyOrder,Market};
+use crate::state::{BuyOrder,Market,OrderCreatedEvent};
 use crate::state::errors::ErrorCode;
 
 pub fn buy_order(ctx:Context<BuyOrderLimit>,_id: u64,quantity: u64,buy_price: u64,base_mint: Option<Pubkey>,quote_mint: Option<Pubkey>) -> Result<()> {
@@ -34,6 +34,20 @@ pub fn buy_order(ctx:Context<BuyOrderLimit>,_id: u64,quantity: u64,buy_price: u6
         authority:ctx.accounts.user.to_account_info(),
         mint:ctx.accounts.token_mint.to_account_info(),
     }),total_usdc_to_pull,ctx.accounts.token_mint.decimals)?;
+
+    emit!(OrderCreatedEvent{
+        id: ctx.accounts.buy_order.id,
+        owner: ctx.accounts.buy_order.owner,
+        quantity: ctx.accounts.buy_order.quantity,
+        remaining: ctx.accounts.buy_order.remaining,
+        quantity_filled: ctx.accounts.buy_order.quantity_filled,
+        buy_price: ctx.accounts.buy_order.buy_price,
+        is_filled: ctx.accounts.buy_order.is_filled,
+        base_mint: ctx.accounts.buy_order.base_mint,
+        quote_mint: ctx.accounts.buy_order.quote_mint,
+        created_at: ctx.accounts.buy_order.created_at,
+    });
+
     Ok(())
 }
 

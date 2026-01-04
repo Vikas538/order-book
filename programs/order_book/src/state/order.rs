@@ -31,3 +31,17 @@ pub struct SellOrder{
     pub created_at:u64,
     pub bump:u8,
 }
+
+#[event]
+pub struct OrderCreatedEvent{
+    pub id:u64,
+    pub owner:Pubkey,
+    pub quantity:u64,
+    pub remaining:u64,
+    pub quantity_filled:u64,
+    pub buy_price:u64,
+    pub is_filled:bool,
+    pub base_mint:Option<Pubkey>,
+    pub quote_mint:Option<Pubkey>,
+    pub created_at:u64,
+}

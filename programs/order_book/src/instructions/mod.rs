@@ -7,3 +7,6 @@ pub use init_market::*;
 
 pub mod sell_order;
 pub use sell_order::*;
+
+pub mod match_order;
+pub use match_order::*;

@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
 
 use anchor_spl::{associated_token::AssociatedToken,  token_interface::{Mint,TokenAccount,TokenInterface,transfer_checked,TransferChecked}};
-use crate::state::{Market,SellOrder};
+use crate::state::{Market,SellOrder,OrderCreatedEvent};
 use crate::state::errors::ErrorCode;
 
 pub fn sell_order(ctx:Context<SellOrderLimit>,id: u64,quantity: u64,sell_price: u64,base_mint: Option<Pubkey>,quote_mint: Option<Pubkey>) -> Result<()> {
@@ -28,6 +28,19 @@ pub fn sell_order(ctx:Context<SellOrderLimit>,id: u64,quantity: u64,sell_price: 
         authority:ctx.accounts.user.to_account_info(),
         mint:ctx.accounts.token_mint.to_account_info(),
     }), quantity, ctx.accounts.token_mint.decimals)?;
+
+    emit!(OrderCreatedEvent{
+        id: ctx.accounts.sell_order.id,
+        owner: ctx.accounts.sell_order.owner,
+        quantity: ctx.accounts.sell_order.quantity,
+        remaining: ctx.accounts.sell_order.remaining,
+        quantity_filled: ctx.accounts.sell_order.quantity_filled,
+        buy_price: ctx.accounts.sell_order.sell_price,
+        is_filled: ctx.accounts.sell_order.is_filled,
+        base_mint: ctx.accounts.sell_order.base_mint,
+        quote_mint: ctx.accounts.sell_order.quote_mint,
+        created_at: ctx.accounts.sell_order.created_at,
+    });
 
     Ok(())
 }
